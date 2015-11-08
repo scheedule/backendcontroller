@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="./bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="./bower_components/highlight/src/styles/default.css">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="1017771976315-g6bc9dc2a6ud3v4ngare0fslpgf4lmqb.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Scheedule</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container-fluid" ng-controller="MyController">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="page-header">
+            <h1>Make Requests</h1>
+          </div>
+          <form id="course_lookup">
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input type="text" autocomplete="off" class="form-control" id="department" placeholder="Dept">
+            </div>
+            <div class="form-group">
+              <label for="number">Number</label>
+              <input type="text" autocomplete="off" class="form-control" id="number" placeholder="Number">
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-default">Query</button>
+            </div>
+          </form>
+
+          <hr>
+
+          <form id="put_schedule">
+            <div class="form-group">
+              <label for="schedule">Schedule</label>
+              <input type="text" autocomplete="off" class="form-control" id="schedule" placeholder='["1", "2"]'>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-default">Put</button>
+            </div>
+          </form>
+          <button id="lookup_schedule" class="btn btn-default">Lookup</button>
+        </div>
+        <div class="col-md-6">
+          <div class="page-header">
+            <h1>Responses</h2>
+          </div>
+          <div hljs source="responseSource"></div>
+      </div>
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+    <script src="./bower_components/jquery/dist/jquery.js"></script>
+    <script src="./bower_components/angular/angular.js"></script>
+    <script src="./bower_components/angular-highlightjs/angular-highlightjs.js"></script>
+    <script>
+function onSignIn(googleUser) {
+  var id_token = googleUser.getAuthResponse().id_token;
+  console.log(id_token);
+
+  $.post('/oauth/', {token: id_token});
+};
+angular.module('myApp', ['hljs'])
+.controller('MyController', ['$scope', function ($scope) {
+
+  function populateResponseBox(res) {
+    $scope.$apply(function(){
+      $scope.responseSource = JSON.stringify(res, null, 2);
+    });
+  }
+
+  $('form#course_lookup').submit(function() {
+    var transport = {
+      department: $('#department').val(),
+      number: $('#number').val()
+    };
+
+    $.post('/prx/course/lookup', transport)
+      .done(populateResponseBox)
+      .fail(function(arg){
+        populateResponseBox(arg.statusText);
+      });
+  });
+
+  $('form#put_schedule').submit(function() {
+    var transport = $('#schedule').val();
+    $.post('/prx/schedule/put', transport).done(function(res){
+      $.get('/prx/schedule/lookup', populateResponseBox);
+    }).fail(function(arg){
+      populateResponseBox(arg.statusText)
+    });
+  });
+
+  $('button#lookup_schedule').on('click', function() {
+    $.get('/prx/schedule/lookup', populateResponseBox).fail(function(arg){
+      populateResponseBox(arg.statusText);
+    });
+  });
+}]);
+angular.element(document).ready(function() {
+  angular.bootstrap(document, ['myApp']);
+});
+    </script>
+  </body>
+</html>
