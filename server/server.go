@@ -1,8 +1,8 @@
+// Package server provides all handlers and session management for the application.
 package server
 
 import (
 	"encoding/json"
-	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/scheedule/backend_controller/proxy"
@@ -11,6 +11,8 @@ import (
 	"net/url"
 )
 
+// Type Server holds session information and also which services are registered
+// to be proxied to.
 type Server struct {
 	session_name   string
 	session_secret string
@@ -18,6 +20,7 @@ type Server struct {
 	services       map[string]*url.URL
 }
 
+// Create a new server with session configuration and service registry
 func New(sessionName, sessionSecret string, services map[string]*url.URL) *Server {
 
 	srv := &Server{
@@ -54,7 +57,7 @@ func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
 	if token == "" {
 		http.NotFound(w, r)
 	} else { // New Token!
-		fmt.Println("New token")
+		log.Debug("New token")
 		res, err := http.Get("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + token)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -73,12 +76,14 @@ func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
 		session.Values["user_id"] = m["sub"]
 		session.Values["name"] = m["name"]
 		session.Save(r, w)
-		fmt.Println("Done..:", m["sub"])
+		log.Debug("Done..:", m["sub"])
 	}
 }
 
+// Authentication method to be used by proxy. Checks session for user_id variable
+// set.
 func (s *Server) isAuth(r *http.Request) bool {
-	fmt.Println("Checking auth")
+	log.Debug("Checking auth")
 
 	session, err := s.session_store.Get(r, s.session_name)
 	if err != nil {

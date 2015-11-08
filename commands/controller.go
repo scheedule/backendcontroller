@@ -1,3 +1,5 @@
+// Package commands holds all the commands for the backend_controller program.
+// Flags and configurations are extracted here.
 package commands
 
 import (
@@ -8,6 +10,7 @@ import (
 	"net/url"
 )
 
+// Main command
 var ControllerCmd = &cobra.Command{
 	Use:   "backend_controller",
 	Short: "Service controller",
@@ -37,6 +40,7 @@ var ControllerCmd = &cobra.Command{
 var Verbose bool
 var schedulestore_host, schedulestore_port, coursestore_host, coursestore_port, serve_port string
 
+// Initialize flags
 func init() {
 	ControllerCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
 

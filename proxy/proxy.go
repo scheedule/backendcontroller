@@ -1,8 +1,10 @@
+// Package proxy provides a reverse proxy to several backend services. The proxy
+// allows configuration of authentication filtering.
 package proxy
 
 import (
 	"bytes"
-	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -10,6 +12,7 @@ import (
 	"strings"
 )
 
+// Create HTTP response with status unauthorized
 func NewUnauthorizedResponse(r *http.Request) *http.Response {
 	resp := &http.Response{}
 	resp.Header = make(http.Header)
@@ -19,42 +22,48 @@ func NewUnauthorizedResponse(r *http.Request) *http.Response {
 	return resp
 }
 
+// Transport configurable with authentication
 type AuthorizedTransport struct {
 	RoundTripper http.RoundTripper
 	IsAuth       func(*http.Request) bool
 }
 
+// Transport interface method to process request and return response. IF we the
+// request fails to authenticate, a response indicating status unauthorized
+// is returned. If the request is authenticated, the request continues on to
+// the proper service.
 func (at *AuthorizedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if at.IsAuth(req) {
-		fmt.Println("Letting round trip")
+		log.Debug("Letting round trip")
 		return at.RoundTripper.RoundTrip(req) // Let them through
 	} else {
-		fmt.Println("Returning unauthorized")
+		log.Debug("Returning unauthorized")
 		return NewUnauthorizedResponse(req), nil
 	}
 }
 
+// Create new proxy. Proxy can be configured with "isAuth" argument.
 func New(targets map[string]*url.URL, isAuth func(*http.Request) bool) *httputil.ReverseProxy {
 	director := func(r *http.Request) {
-		fmt.Println(r.URL.Path)
+		log.Debug(r.URL.Path)
 
 		spl := strings.Split(r.URL.Path, "/")
-		fmt.Println(spl)
+		log.Debug(spl)
 
 		if len(spl) < 2 {
-			fmt.Println("Failed to match")
+			log.Warn("Failed to match")
 			return
 		}
 
 		service := spl[1]
-		fmt.Println("Service:", service)
+		log.Debug("Service:", service)
 
 		target := targets[service]
 		if target == nil {
-			fmt.Println("Failed to lookup service")
+			log.Warn("Failed to lookup service")
 			return
 		}
-		fmt.Println("url:", target)
+		log.Debug("url:", target)
 
 		newPath := "/" + strings.Join(spl[2:], "/")
 
