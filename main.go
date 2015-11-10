@@ -2,7 +2,7 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/scheedule/backend_controller/commands"
+	"github.com/scheedule/backendcontroller/commands"
 )
 
 func main() {

@@ -6,11 +6,11 @@ RUN apt-get install -y golang git
 ENV GOPATH /go
 
 # Grab Source
-COPY . /go/src/github.com/scheedule/backend_controller
+COPY . /go/src/github.com/scheedule/backendcontroller
 
-WORKDIR /go/src/github.com/scheedule/backend_controller
+WORKDIR /go/src/github.com/scheedule/backendcontroller
 
 # Grab project dependencies and build
 RUN go get ./... && go install
 
-ENTRYPOINT ["/go/bin/backend_controller"]
+ENTRYPOINT ["/go/bin/backendcontroller"]

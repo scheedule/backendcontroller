@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
-	"github.com/scheedule/backend_controller/proxy"
+	"github.com/scheedule/backendcontroller/proxy"
 	"io/ioutil"
 	"net/http"
 	"net/url"

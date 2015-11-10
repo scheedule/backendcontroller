@@ -1,10 +1,10 @@
-// Package commands holds all the commands for the backend_controller program.
+// Package commands holds all the commands for the backendcontroller program.
 // Flags and configurations are extracted here.
 package commands
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/scheedule/backend_controller/server"
+	"github.com/scheedule/backendcontroller/server"
 	"github.com/spf13/cobra"
 	"net/http"
 	"net/url"
@@ -12,7 +12,7 @@ import (
 
 // Main command
 var ControllerCmd = &cobra.Command{
-	Use:   "backend_controller",
+	Use:   "backendcontroller",
 	Short: "Service controller",
 	Long:  "Provide proxy to backend services",
 	Run: func(cmd *cobra.Command, args []string) {
