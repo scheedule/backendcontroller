@@ -40,6 +40,9 @@ func New(sessionName, sessionSecret string, services map[string]*url.URL) *Serve
 	// Static GUI
 	http.Handle("/", http.FileServer(http.Dir("./public")))
 
+	log.Info("Handling web GUI on /")
+	log.Info("Handling proxying to services on /prx/")
+
 	return srv
 }
 
