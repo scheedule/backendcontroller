@@ -3,31 +3,32 @@ package server
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
-	"github.com/gorilla/sessions"
-	"github.com/scheedule/backendcontroller/proxy"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/sessions"
+	"github.com/scheedule/backendcontroller/proxy"
 )
 
 // Type Server holds session information and also which services are registered
 // to be proxied to.
 type Server struct {
-	session_name   string
-	session_secret string
-	session_store  *sessions.CookieStore
-	services       map[string]*url.URL
+	sessionName   string
+	sessionSecret string
+	sessionStore  *sessions.CookieStore
+	services      map[string]*url.URL
 }
 
 // Create a new server with session configuration and service registry
 func New(sessionName, sessionSecret string, services map[string]*url.URL) *Server {
 
 	srv := &Server{
-		session_name:   sessionName,
-		session_secret: sessionSecret,
-		session_store:  sessions.NewCookieStore([]byte(sessionSecret)),
-		services:       services,
+		sessionName:   sessionName,
+		sessionSecret: sessionSecret,
+		sessionStore:  sessions.NewCookieStore([]byte(sessionSecret)),
+		services:      services,
 	}
 
 	// Proxy services
@@ -48,7 +49,7 @@ func New(sessionName, sessionSecret string, services map[string]*url.URL) *Serve
 
 // Callback to interrogate OAuth token in session
 func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
-	session, err := s.session_store.Get(r, s.session_name)
+	session, err := s.sessionStore.Get(r, s.sessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -80,6 +81,7 @@ func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
 		session.Values["name"] = m["name"]
 		session.Save(r, w)
 		log.Debug("Done..:", m["sub"])
+		w.WriteHeader(200)
 	}
 }
 
@@ -88,7 +90,7 @@ func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
 func (s *Server) isAuth(r *http.Request) bool {
 	log.Debug("Checking auth")
 
-	session, err := s.session_store.Get(r, s.session_name)
+	session, err := s.sessionStore.Get(r, s.sessionName)
 	if err != nil {
 		return false
 	}

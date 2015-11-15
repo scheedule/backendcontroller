@@ -3,15 +3,16 @@
 package commands
 
 import (
+	"net/http"
+	"net/url"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/scheedule/backendcontroller/server"
 	"github.com/spf13/cobra"
-	"net/http"
-	"net/url"
 )
 
 // Main command
-var ControllerCmd = &cobra.Command{
+var controllerCmd = &cobra.Command{
 	Use:   "backendcontroller",
 	Short: "Service controller",
 	Long:  "Provide proxy to backend services",
@@ -22,54 +23,54 @@ var ControllerCmd = &cobra.Command{
 		var services = map[string]*url.URL{
 			"course": {
 				Scheme: "http",
-				Host:   coursestore_host + ":" + coursestore_port,
+				Host:   coursestoreHost + ":" + coursestorePort,
 			},
 			"schedule": {
 				Scheme: "http",
-				Host:   schedulestore_host + ":" + schedulestore_port,
+				Host:   schedulestoreHost + ":" + schedulestorePort,
 			},
 		}
 
 		server.New("sessionname", "sessionsecret", services)
 
-		log.Fatal(http.ListenAndServe(":"+serve_port, nil))
+		log.Fatal(http.ListenAndServe(":"+servePort, nil))
 		log.Info("Listening")
 	},
 }
 
-var Verbose bool
-var schedulestore_host, schedulestore_port, coursestore_host, coursestore_port, serve_port string
+var verbose bool
+var schedulestoreHost, schedulestorePort, coursestoreHost, coursestorePort, servePort string
 
 // Initialize flags
 func init() {
-	ControllerCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+	controllerCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 
-	ControllerCmd.Flags().StringVarP(
-		&schedulestore_host, "schedulestore_host", "", "schedulestore", "Hostname of schedule store")
+	controllerCmd.Flags().StringVarP(
+		&schedulestoreHost, "schedulestore_host", "", "schedulestore", "Hostname of schedule store")
 
-	ControllerCmd.Flags().StringVarP(
-		&schedulestore_port, "schedulestore_port", "", "", "Port of schedule store")
+	controllerCmd.Flags().StringVarP(
+		&schedulestorePort, "schedulestore_port", "", "", "Port of schedule store")
 
-	ControllerCmd.Flags().StringVarP(
-		&coursestore_host, "coursestore_host", "", "coursestore", "Hostname of course store")
+	controllerCmd.Flags().StringVarP(
+		&coursestoreHost, "coursestore_host", "", "coursestore", "Hostname of course store")
 
-	ControllerCmd.Flags().StringVarP(
-		&coursestore_port, "coursestore_port", "", "", "Port of course store")
+	controllerCmd.Flags().StringVarP(
+		&coursestorePort, "coursestore_port", "", "", "Port of course store")
 
-	ControllerCmd.Flags().StringVarP(
-		&serve_port, "serve_port", "", "8080", "Port to serve endpoint on")
+	controllerCmd.Flags().StringVarP(
+		&servePort, "serve_port", "", "8080", "Port to serve endpoint on")
 }
 
 // Initialize configuration settings
 func InitializeConfig() {
-	if Verbose {
+	if verbose {
 		log.SetLevel(log.DebugLevel)
 	}
 }
 
 // Execute controller command
 func Execute() {
-	if err := ControllerCmd.Execute(); err != nil {
+	if err := controllerCmd.Execute(); err != nil {
 		panic(err)
 	}
 }

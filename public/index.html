@@ -44,7 +44,7 @@
           <form id="put_schedule">
             <div class="form-group">
               <label for="schedule">Schedule</label>
-              <input type="text" autocomplete="off" class="form-control" id="schedule" placeholder='["1", "2"]'>
+              <input type="text" autocomplete="off" class="form-control" id="schedule" placeholder='{"name":"Schedule 1", "CRNList":["1", "2"]}'>
             </div>
             <div class="form-group">
               <button type="submit" class="btn btn-default">Put</button>
@@ -94,15 +94,19 @@ angular.module('myApp', ['hljs'])
 
   $('form#put_schedule').submit(function() {
     var transport = $('#schedule').val();
-    $.post('/prx/schedule/put', transport).done(function(res){
-      $.get('/prx/schedule/lookup', populateResponseBox);
+    $.ajax('/prx/schedule', {
+      data: transport,
+      type: 'PUT',
+      contentType: 'application/json'
+    }).done(function(){
+      $.get('/prx/schedule', populateResponseBox);
     }).fail(function(arg){
       populateResponseBox(arg.statusText)
     });
   });
 
   $('button#lookup_schedule').on('click', function() {
-    $.get('/prx/schedule/lookup', populateResponseBox).fail(function(arg){
+    $.get('/prx/schedule', populateResponseBox).fail(function(arg){
       populateResponseBox(arg.statusText);
     });
   });

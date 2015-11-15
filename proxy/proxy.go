@@ -4,12 +4,13 @@ package proxy
 
 import (
 	"bytes"
-	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Create HTTP response with status unauthorized
