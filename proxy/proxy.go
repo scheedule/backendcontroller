@@ -35,10 +35,10 @@ type AuthorizedTransport struct {
 // the proper service.
 func (at *AuthorizedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if at.IsAuth(req) {
-		log.Debug("Letting round trip")
+		log.Debug("letting round trip")
 		return at.RoundTripper.RoundTrip(req) // Let them through
 	} else {
-		log.Debug("Returning unauthorized")
+		log.Debug("returning unauthorized")
 		return NewUnauthorizedResponse(req), nil
 	}
 }
@@ -49,22 +49,20 @@ func New(targets map[string]*url.URL, isAuth func(*http.Request) bool) *httputil
 		log.Debug(r.URL.Path)
 
 		spl := strings.Split(r.URL.Path, "/")
-		log.Debug(spl)
 
 		if len(spl) < 2 {
-			log.Warn("Failed to match")
+			log.Warn("failed to match path: ", spl)
 			return
 		}
 
 		service := spl[1]
-		log.Debug("Service:", service)
+		log.Debug("directing to service: ", service)
 
-		target := targets[service]
-		if target == nil {
-			log.Warn("Failed to lookup service")
+		target, ok := targets[service]
+		if !ok {
+			log.Warn("failed to lookup service")
 			return
 		}
-		log.Debug("url:", target)
 
 		newPath := "/" + strings.Join(spl[2:], "/")
 

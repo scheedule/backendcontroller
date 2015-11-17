@@ -34,7 +34,7 @@ var controllerCmd = &cobra.Command{
 		server.New("sessionname", "sessionsecret", services)
 
 		log.Fatal(http.ListenAndServe(":"+servePort, nil))
-		log.Info("Listening")
+		log.Info("serving on port:", servePort)
 	},
 }
 
