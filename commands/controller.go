@@ -49,13 +49,13 @@ func init() {
 		&schedulestoreHost, "schedulestore_host", "", "schedulestore", "Hostname of schedule store")
 
 	controllerCmd.Flags().StringVarP(
-		&schedulestorePort, "schedulestore_port", "", "", "Port of schedule store")
+		&schedulestorePort, "schedulestore_port", "", "5000", "Port of schedule store")
 
 	controllerCmd.Flags().StringVarP(
 		&coursestoreHost, "coursestore_host", "", "coursestore", "Hostname of course store")
 
 	controllerCmd.Flags().StringVarP(
-		&coursestorePort, "coursestore_port", "", "", "Port of course store")
+		&coursestorePort, "coursestore_port", "", "7819", "Port of course store")
 
 	controllerCmd.Flags().StringVarP(
 		&servePort, "serve_port", "", "8080", "Port to serve endpoint on")
