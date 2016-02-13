@@ -19,16 +19,18 @@ type Server struct {
 	sessionSecret string
 	sessionStore  *sessions.CookieStore
 	services      map[string]*url.URL
+	public        bool
 }
 
 // Create a new server with session configuration and service registry
-func New(sessionName, sessionSecret string, services map[string]*url.URL) *Server {
+func New(sessionName, sessionSecret string, services map[string]*url.URL, public bool) *Server {
 
 	srv := &Server{
 		sessionName:   sessionName,
 		sessionSecret: sessionSecret,
 		sessionStore:  sessions.NewCookieStore([]byte(sessionSecret)),
 		services:      services,
+		public:        public,
 	}
 
 	// Proxy services
@@ -89,6 +91,12 @@ func (s *Server) oauthCallback(w http.ResponseWriter, r *http.Request) {
 // set.
 func (s *Server) isAuth(r *http.Request) bool {
 	log.Debug("Checking auth")
+	log.Debug("Public: ", s.public)
+
+	if s.public {
+		r.Header.Set("user_id", "")
+		return true
+	}
 
 	session, err := s.sessionStore.Get(r, s.sessionName)
 	if err != nil {

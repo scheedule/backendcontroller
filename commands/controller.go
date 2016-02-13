@@ -31,19 +31,20 @@ var controllerCmd = &cobra.Command{
 			},
 		}
 
-		server.New("sessionname", "sessionsecret", services)
+		server.New("sessionname", "sessionsecret", services, public)
 
 		log.Fatal(http.ListenAndServe(":"+servePort, nil))
 		log.Info("serving on port:", servePort)
 	},
 }
 
-var verbose bool
+var verbose, public bool
 var schedulestoreHost, schedulestorePort, coursestoreHost, coursestorePort, servePort string
 
 // Initialize flags
 func init() {
 	controllerCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	controllerCmd.Flags().BoolVarP(&public, "public", "p", false, "Set user_id to \"\" and propogate")
 
 	controllerCmd.Flags().StringVarP(
 		&schedulestoreHost, "schedulestore_host", "", "schedulestore", "Hostname of schedule store")
