@@ -44,7 +44,7 @@
           <form id="put_schedule">
             <div class="form-group">
               <label for="schedule">Schedule</label>
-              <input type="text" autocomplete="off" class="form-control" id="schedule" placeholder='{"name":"Schedule 1", "CRNList":["1", "2"]}'>
+              <input type="text" autocomplete="off" class="form-control" id="schedule" placeholder='{"name":"Schedule 1", "CRNList":[1, 2]}'>
             </div>
             <div class="form-group">
               <button type="submit" class="btn btn-default">Put</button>
@@ -85,7 +85,7 @@ angular.module('myApp', ['hljs'])
       number: $('#number').val()
     };
 
-    $.post('/prx/course/lookup', transport)
+    $.get('/prx/course/lookup/' + transport.department + '/' + transport.number)
       .done(populateResponseBox)
       .fail(function(arg){
         populateResponseBox(arg.statusText);
